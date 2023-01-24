@@ -61,9 +61,9 @@ def main():
                     st.session_state.load_state = True
                     client = MongoClient("mongodb://localhost:27017/")
                     # database
-                    db = client["stocks_database"]
+                    db = client["Twitter_Scrap"]
                     # collection
-                    collection= db[f"Scrap {hashtag}"]
+                    collection= db[f"{hashtag}_tweets"]
                     df.reset_index(inplace=True)
 
                     dict=df.to_dict(orient='records')
