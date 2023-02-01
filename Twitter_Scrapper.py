@@ -18,31 +18,32 @@ def main():
 
         with col3:
             st.title('TWITTER_SCRAP')
-            # Create a input 
+
+         # Create a input 
         hashtag=st.text_input('Enter the Username or Hashtag(#example) ')
         tconut=st.number_input("Tweet count need to scraped",0,1000000)
         from_date=st.date_input("Since")
         end_date=st.date_input("Until")
         
-        #create a button
-        
+        #create a scrap button
         load=st.button('SCRAP')
+        #initialize session state
         if "load_state" not in st.session_state:
             st.session_state.load_state=False
         
         if load or st.session_state.load_state :
             st.session_state.load_state=True
            
-            with st.spinner("Please wait..."):
-                time.sleep(3)
             
+            need=(f'{hashtag} since:{from_date} until:{end_date}')
             tweets = []
-            for tweet in sntwitter.TwitterSearchScraper('{}'.format(hashtag)).get_items():
+            for tweet in sntwitter.TwitterSearchScraper(need).get_items():
                 if len(tweets)== tconut:
                     break
                 else:
                     tweets.append({'date': tweet.date, 'id': tweet.id, 'url': tweet.url,'tweet_content': tweet.content,'user': tweet.user.username,
                      'replyCount': tweet.replyCount, 'retweet_count': tweet.retweetCount,'language': tweet.lang, 'source': tweet.source, 'like_count': tweet.likeCount})
+            
             df=pd.DataFrame(tweets,columns=["date","id","url","content","user","replyCount","retweetCount","language","source","likeCount"])
             
             #display DataFrame
