@@ -5,7 +5,6 @@ import pandas as pd
 from pymongo import MongoClient
 import streamlit as st
 import snscrape.modules.twitter as sntwitter
-import pyautogui
 
 
 def main():
@@ -26,26 +25,22 @@ def main():
         end_date=st.date_input("Until")
         
         #create a button
-        col1,col2,col3,col4,col5=st.columns(5)
-        with col2:
-            reset=st.button("RESET")
-            if reset:
-                pyautogui.hotkey("ctrl","F5")
-        with col4:
-            load=st.button('SCRAP')
-        #initialize session state
+        
+        load=st.button('SCRAP')
         if "load_state" not in st.session_state:
             st.session_state.load_state=False
-
-        if load or st.session_state.load_state:
-            st.session_state.load_state = True
+        
+        if load or st.session_state.load_state :
+            st.session_state.load_state=True
+           
 
             tweets = []
             for tweet in sntwitter.TwitterSearchScraper('{}'.format(hashtag)).get_items():
                 if len(tweets)== tconut:
                     break
                 else:
-                    tweets.append({'date': tweet.date, 'id': tweet.id, 'url': tweet.url,'tweet_content': tweet.content,'user': tweet.user.username, 'replyCount': tweet.replyCount, 'retweet_count': tweet.retweetCount,'language': tweet.lang, 'source': tweet.source, 'like_count': tweet.likeCount})
+                    tweets.append({'date': tweet.date, 'id': tweet.id, 'url': tweet.url,'tweet_content': tweet.content,'user': tweet.user.username,
+                     'replyCount': tweet.replyCount, 'retweet_count': tweet.retweetCount,'language': tweet.lang, 'source': tweet.source, 'like_count': tweet.likeCount})
             df=pd.DataFrame(tweets,columns=["date","id","url","content","user","replyCount","retweetCount","language","source","likeCount"])
             
             #display DataFrame
@@ -54,21 +49,19 @@ def main():
             col1,col2,col3,col4,col5=st.columns(5)
             with col4:
                 connect=st.button('upload Database')
-                if "load_state" not in st.session_state:
-                    st.session_state.load_state=False
+                
 
-                if connect or st.session_state.load_state: 
-                    st.session_state.load_state = True
+                if connect:
+                    
                     client = MongoClient("mongodb://localhost:27017/")
                     # database
-                    db = client["Twitter_Scrap"]
+                    db = client["twitter_scrap"]
                     # collection
                     collection= db[f"{hashtag}_tweets"]
                     df.reset_index(inplace=True)
 
                     dict=df.to_dict(orient='records')
                     collection.insert_one({"index":"scaped data","data":dict})
-                    
 
             with col2:
                 st.download_button(
