@@ -4,8 +4,8 @@
 import pandas as pd
 from pymongo import MongoClient
 import streamlit as st
+import time
 import snscrape.modules.twitter as sntwitter
-
 
 def main():
     menu = ["HOME","ABOUT"]
@@ -33,7 +33,9 @@ def main():
         if load or st.session_state.load_state :
             st.session_state.load_state=True
            
-
+            with st.spinner("Please wait..."):
+                time.sleep(3)
+            
             tweets = []
             for tweet in sntwitter.TwitterSearchScraper('{}'.format(hashtag)).get_items():
                 if len(tweets)== tconut:
@@ -46,8 +48,8 @@ def main():
             #display DataFrame
             st.dataframe(df)
 
-            col1,col2,col3,col4,col5=st.columns(5)
-            with col4:
+            left,right=st.columns(2)
+            with right:
                 connect=st.button('upload Database')
                 
 
@@ -62,22 +64,26 @@ def main():
 
                     dict=df.to_dict(orient='records')
                     collection.insert_one({"index":"scaped data","data":dict})
-
-            with col2:
-                st.download_button(
+                    st.success("successfully Uploaded")
+            with left:
+                if st.download_button(
                     "download as csv",
                     df.to_csv(),
                     file_name=f"{hashtag}_tweets_data.csv",
                     mime='text/csv'
-                    )
+                    ):
+                    st.success("File Downloaded")
 
-                st.download_button(
+                if st.download_button(
                     "downlaod as json",
                     df.to_json(orient='records', force_ascii=False, indent=4, default_handler=str),
                     file_name=f"{hashtag}_tweets_data.json",
                     mime='application/json'
-                    )
+                    ):
+                    st.success("File downloaded")
 
+    if choice =="ABOUT":
+        st.title("THANKYOU")
 
 if __name__ == '__main__':
     main()
