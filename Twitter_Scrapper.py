@@ -19,7 +19,7 @@ def main():
         with col3:
             st.title('TWITTER_SCRAP')
 
-         # Create a input 
+         # Get input from user 
         hashtag=st.text_input('Enter the Username or Hashtag(#example) ')
         tconut=st.number_input("Tweet count need to scraped",0,1000000)
         from_date=st.date_input("Since")
@@ -53,7 +53,7 @@ def main():
             with right:
                 connect=st.button('upload Database')
                 
-
+                #connect mangodb client
                 if connect:
                     
                     client = MongoClient("mongodb://localhost:27017/")
@@ -67,6 +67,7 @@ def main():
                     collection.insert_one({"index":"scaped data","data":dict})
                     st.success("successfully Uploaded")
             with left:
+                #download button for csv
                 if st.download_button(
                     "download as csv",
                     df.to_csv(),
@@ -74,7 +75,7 @@ def main():
                     mime='text/csv'
                     ):
                     st.success("File Downloaded")
-
+                #download button for json
                 if st.download_button(
                     "downlaod as json",
                     df.to_json(orient='records', force_ascii=False, indent=4, default_handler=str),
